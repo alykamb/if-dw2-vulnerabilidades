@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { FastifyReply } from 'fastify'
-import { createReadStream } from 'fs'
+import { createReadStream, statSync } from 'fs'
+import { readFile } from 'fs/promises'
 import { lookup } from 'mime-types'
 import { extname, join, resolve } from 'path'
+
+import { CRSF_PROTECTION } from './vulnerabilidadades.constants'
 
 @Injectable()
 export class AppService {
@@ -15,14 +18,47 @@ export class AppService {
         if (!ext.length) {
             fileName = 'index.html'
         }
-        if (fileName === 'index.html') {
-            clientDist = resolve(__dirname, '..', '..', 'client')
-        }
 
         const type = lookup(extname(fileName))
+        const path = join(clientDist, fileName)
 
+        if (fileName === 'index.html') {
+            clientDist = resolve(__dirname, '..', '..', 'client')
+            void res.header('Content-Type', type)
+
+            if (!CRSF_PROTECTION) {
+                void res.send(createReadStream(path))
+                return
+            }
+
+            void readFile(path)
+                .then((file) => file.toString('utf-8'))
+                .then((file) => {
+                    const token = 'código gerado aleatóriamente'
+                    const endOfHeadIndex = file.indexOf('</head>')
+                    const f =
+                        file.substring(0, endOfHeadIndex) +
+                        `<meta name="csrf_token" content="${token}">` +
+                        file.substring(endOfHeadIndex)
+
+                    void res.setCookie('csrf_token', token, {
+                        sameSite: 'strict',
+                        httpOnly: true,
+                    })
+
+                    return res.send(f)
+                })
+            return
+        }
+
+        try {
+            statSync(path)
+        } catch (err) {
+            void res.status(404).send()
+            return
+        }
         void res.header('Content-Type', type)
-        void res.send(createReadStream(join(clientDist, fileName)))
+        void res.send(createReadStream(path))
     }
 
     public async getFile(requestedFile: string, res: FastifyReply): Promise<void> {

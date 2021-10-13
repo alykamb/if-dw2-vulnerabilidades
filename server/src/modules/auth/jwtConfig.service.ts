@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { JwtModuleOptions } from '@nestjs/jwt'
+
 import { JWT_SECRET } from './jwt.constants'
 
 @Injectable()

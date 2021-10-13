@@ -19,7 +19,7 @@ export class NotFoundExceptionFilter implements ExceptionFilter {
         const req: FastifyRequest = ctx.getRequest()
 
         if (req.url.indexOf('/api/') === 0) {
-            throw new NotFoundException()
+            return res.status(404).send()
         }
 
         const url = req.url.replace(/^\//, '')

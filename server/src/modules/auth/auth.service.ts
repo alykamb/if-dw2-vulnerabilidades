@@ -1,10 +1,20 @@
 import { Injectable } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
 
-const usuarios = [
+export const usuarios = [
     {
-        userId: 1,
+        id: 0,
         username: 'usuario1',
+        password: '$2b$12$uRBFJKZpr4b1eT64XqfxPeiq6dtSZ7vmQa2HSdpkPoCc5uc.mdE0a', //teste123
+    },
+    {
+        id: 1,
+        username: 'usuario2',
+        password: '$2b$12$uRBFJKZpr4b1eT64XqfxPeiq6dtSZ7vmQa2HSdpkPoCc5uc.mdE0a', //teste123
+    },
+    {
+        id: 2,
+        username: 'malvadao',
         password: '$2b$12$uRBFJKZpr4b1eT64XqfxPeiq6dtSZ7vmQa2HSdpkPoCc5uc.mdE0a', //teste123
     },
 ]

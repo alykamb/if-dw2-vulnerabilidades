@@ -2,10 +2,38 @@
 version: "3.7"
 
 networks:
-  meucrediario-private-network:
+  ifc-dw2-vulnerabilidades-network:
+    external: true
+
+volumes:
+  ifc-dw2-vulnerabilidades-db:
     external: true
 
 services:
+  db:
+    container_name: ifc-dw2-vulnerabilidades-db
+    image: "postgres:14-alpine"
+    restart: always
+    volumes:
+      - ifc-dw2-vulnerabilidades-db:/var/lib/postgresql/data
+    env_file:
+      - .env.local
+      - .env.${NODE_ENV}.local
+      - .env.${NODE_ENV}
+      - .env
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    ports:
+      - 5432:5432
+    networks:
+      - ifc-dw2-vulnerabilidades-network
   app:
     container_name: nest-vite
     build:
@@ -21,8 +49,8 @@ services:
       - ".:/srv/www"
       - /srv/www/node_modules/
     networks:
-      - meucrediario-private-network
-    command: $COMMAND_DOCKER #'sh -c "cd config && node run.mjs"'
+      - ifc-dw2-vulnerabilidades-network
+    command: sh -c "cd config && node run.mjs"'
     env_file:
       - .env.local
       - .env.${NODE_ENV}.local

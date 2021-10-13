@@ -1,19 +1,34 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable import/no-extraneous-dependencies */
+const a11yOff = Object.keys(require('eslint-plugin-jsx-a11y').rules).reduce((acc, rule) => {
+    acc[`jsx-a11y/${rule}`] = 'off'
+    return acc
+}, {})
+
 module.exports = {
     root: true,
     env: {
         node: true,
     },
-    plugins: ['react', 'import', '@typescript-eslint', 'sort-class-members', 'simple-import-sort', ],
+    plugins: ['react', 'import', '@typescript-eslint', 'sort-class-members', 'simple-import-sort'],
     extends: [
-        'eslint:recommended',
+        'airbnb-typescript',
+        'airbnb/hooks',
         'plugin:@typescript-eslint/recommended',
+        'plugin:jest/recommended',
+        'plugin:prettier/recommended',
     ],
+
     rules: {
+        ...a11yOff,
         'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
         'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
         'no-extra-parens': 'off',
         'no-extra-semi': 'off',
         'no-unneeded-ternary': 'error',
+        'import/prefer-default-export': 'off',
+        // 'jsx-a11y/label-has-associated-control': 'off',
+        // 'jsx-a11y/control-has-associated-label': 'off',
         'sort-class-members/sort-class-members': [
             1,
             {
@@ -45,17 +60,9 @@ module.exports = {
         '@typescript-eslint/ban-ts-comment': 0,
         '@typescript-eslint/explicit-module-boundary-types': 0,
         '@typescript-eslint/no-unused-vars': 'error',
-        '@typescript-eslint/naming-convention': [
-            'error',
-            {
-                selector: 'interface',
-                format: ['PascalCase'],
-                custom: {
-                    regex: '^I[A-Z]',
-                    match: true,
-                },
-            },
-        ],
+        'react/jsx-props-no-spreading': 0,
+        'react/no-array-index-key': 0,
+        'react-hooks/exhaustive-deps': 0,
     },
     parserOptions: {
         parser: '@typescript-eslint/parser',
